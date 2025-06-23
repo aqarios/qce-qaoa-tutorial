@@ -1,0 +1,32 @@
+[project]
+name = "qce-qaoa-tutorial"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aqmodels",
+    "matplotlib>=3.10.3",
+    "networkx>=3.5",
+    "numpy>=2.3.0",
+    "pylatexenc>=2.10",
+    "qiskit>=2.0.2",
+    "qiskit-aer>=0.17.1",
+    "scipy>=1.15.3",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "jupyterlab>=4.4.3",
+    "jupyterlab-code-formatter>=3.0.2",
+    "jupyterlab-vim>=4.1.4",
+    "ruff>=0.11.13",
+]
+
+[tool.uv.workspace]
+members = ["qce-qaoa-tutorial-public"]
+
+[tool.uv.sources]
+aqmodels = { git = "ssh://git@github.com/aqarios/aq-models-rs.git", branch = "development" }
