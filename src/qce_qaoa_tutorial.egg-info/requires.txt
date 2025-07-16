@@ -1,0 +1,12 @@
+aqmodels
+dotenv>=0.9.9
+ipywidgets>=8.1.7
+luna-quantum==1.0.1
+matplotlib>=3.10.3
+networkx>=3.5
+numpy>=2.3.0
+pylatexenc>=2.10
+pyscipopt>=5.5.0
+qiskit>=2.0.2
+qiskit-aer>=0.17.1
+scipy>=1.15.3
