@@ -328,7 +328,6 @@ class SessionChair:
 
 
 class Schedule(dict[str, str]):
-
     @staticmethod
     def random(num: int, convention_center: ConventionCenter, seed: int | None = None):
         rng = np.random.default_rng(seed)

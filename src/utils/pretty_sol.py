@@ -30,7 +30,7 @@ class pretty:
             if not self._all_vars:
                 s += "<td></td>"
             s += f'<td style="border-left: solid 1px;">{x.obj_value:.2f}</ td>'
-            s += f'<td>{x.counts}</ td>'
+            s += f"<td>{x.counts}</ td>"
             s += f'<td style="color: {"blue" if x.feasible else "red"}">{x.feasible}</ td>'
             s += "</tr>"
         if len(self._sorted) > 20:

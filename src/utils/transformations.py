@@ -2,7 +2,6 @@ import itertools
 from typing import override
 
 import networkx as nx
-import numpy as np
 import rustworkx as rx
 from aqmodels import (
     Comparator,
@@ -12,7 +11,6 @@ from aqmodels import (
     Quadratic,
     Solution,
     Variable,
-    Vtype,
 )
 from aqmodels.decorators import analyse, transform
 from aqmodels.transformations import (

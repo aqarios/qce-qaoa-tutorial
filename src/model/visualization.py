@@ -12,9 +12,7 @@ from .data import ConventionCenter, Schedule, SessionChair, get_door
 def solution_to_assignment(
     x: dict[tuple[str, int], Variable], best: Result, chairs: list[SessionChair]
 ):
-    return [
-        (chairs[ch].name, room) for (room, ch), xi in x.items() if best.sample[xi]
-    ]
+    return [(chairs[ch].name, room) for (room, ch), xi in x.items() if best.sample[xi]]
 
 
 def plot_floor_plan(
