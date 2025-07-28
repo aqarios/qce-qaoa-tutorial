@@ -2,6 +2,7 @@ import numpy as np
 from aqmodels import HigherOrder, Linear, Model, Quadratic, Vtype
 from aqmodels.transformations import IR
 from qiskit.circuit import Parameter, QuantumCircuit
+from qiskit.circuit.library import XXPlusYYGate
 
 
 def cost_layer(model: Model, gamma: Parameter | float, scale: float = 1.0):
@@ -241,8 +242,9 @@ def rxy(beta: Parameter | float):
     QuantumCircuit
     """
     qc = QuantumCircuit(2)
-    qc.rxx(beta, 0, 1)
-    qc.ryy(beta, 0, 1)
+    # qc.rxx(beta, 0, 1)
+    # qc.ryy(beta, 0, 1)
+    qc.append(XXPlusYYGate(2 * beta).definition, (0, 1))
     return qc
 
 

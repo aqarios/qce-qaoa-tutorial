@@ -156,71 +156,9 @@ class QuadraticPenaltyPass(TransformationPass):
         return solution
 
 
-def remove_slack(solution: Solution, cache: AnalysisCache):
-    raise NotImplementedError()
-    slacks = cache["inequality-to-equality"]
-    # for slack in slacks:
-    #     solution.remove_var(slack)
-    return solution
-
-
-@transform()
-def inequality_to_equality(model: Model, _: AnalysisCache):
-    """Transform inequality constraints to equality constraints."""
-
-    to_remove = []
-
-    slacks = []
-    for i, c in enumerate(model.constraints):
-        if c.comparator == Comparator.Eq:
-            continue
-        name = c.name or f"c{i}"
-
-        # evaluate upper / lower bound of slack
-        min_v = 0
-        max_v = 0
-        for k, v in c.lhs.items():
-            if not isinstance(k, Linear) or k.var.vtype != Vtype.Binary or int(v) != v:
-                raise RuntimeError(
-                    "Currently only binary linear integer biased constraints supported."
-                )
-            if v > 0:
-                max_v += int(v)
-            if v < 0:
-                min_v += int(v)
-        if c.comparator == Comparator.Le:
-            dst = int(c.rhs) - min_v
-        else:
-            dst = max_v - int(c.rhs)
-
-        # Add binary slack variables
-        num_var = int(np.ceil(np.log2(dst)))
-        last = dst - 1 << (num_var - 1) - 1
-        coeff = [1 << i for i in range(num_var - 1)] + [last]
-        vars = [model.add_variable(f"sl_{name}_{i}") for i in range(num_var)]
-        slacks += vars
-        slack = sum(v * c for v, c in zip(vars, coeff))
-
-        if c.comparator == Comparator.Ge:
-            slack *= -1
-
-        to_remove.append(c.name or i)
-
-        model.add_constraint(c.lhs + slack == c.rhs, name=f"eq_{name}")
-
-    if len(to_remove) == 0:
-        return TransformationOutcome.nothing(model)
-
-    for r in reversed(to_remove):
-        model.constraints.remove(r)
-
-    return model, ActionType.DidTransform, slacks
-
-
 qubo_pipeline = PassManager(
     [
         MaxBiasAnalysis(),
-        inequality_to_equality,
         QuadraticPenaltyPass(),
         MaxBiasAnalysis(),
     ]

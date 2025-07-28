@@ -95,7 +95,7 @@ class MyQAOA:
         )
 
         sol = sample(ir.model, qc, res.x, self.shots)
-        res = self.pass_manager.backwards(sol, ir)
+        res = model.evaluate(self.pass_manager.backwards(sol, ir))
 
         class ResultWrapper:
             def result(self):
