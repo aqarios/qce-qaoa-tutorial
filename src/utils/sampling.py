@@ -1,4 +1,4 @@
-from aqmodels import Model, Solution
+from luna_quantum import Model, Solution
 from qiskit import QuantumCircuit
 from qiskit.circuit.gate import np
 from qiskit_aer.primitives import SamplerV2

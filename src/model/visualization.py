@@ -2,17 +2,19 @@ import itertools
 
 import matplotlib.pyplot as plt
 import numpy as np
-from aqmodels import Result, Variable
+from luna_quantum import Result, Variable
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 
 from .data import ConventionCenter, Schedule, SessionChair, get_door
 
 
-def solution_to_assignment(
-    x: dict[tuple[str, int], Variable], best: Result, chairs: list[SessionChair]
-):
-    return [(chairs[ch].name, room) for (room, ch), xi in x.items() if best.sample[xi]]
+def solution_to_assignment(best: Result, chairs: list[SessionChair]):
+    def _from_name(k):
+        _, r, i = k.split("_")
+        return chairs[int(i)].name, r
+
+    return [_from_name(k) for k, v in best.sample.to_dict().items() if v == 1]
 
 
 def plot_floor_plan(
@@ -78,10 +80,9 @@ def plot_floor_plan(
             plt.scatter(
                 x_data,
                 y_data,
-                s=60 * chair.lazy + 50,
+                s=60 * (4 - chair.fitness) + 50,
                 marker=chair.marker,
-                label=f"{chair.name}(lazy={chair.lazy}, "
-                f"favs={','.join(chair.favourites)})",
+                label=f"{chair.name}(fitness={chair.fitness}, fav={chair.favorite})",
                 zorder=1000,
             )
 
@@ -117,7 +118,7 @@ def plot_satisfaction(
     sat = {chair.name: 0.0 for chair in chairs}
     for c, r in assignment:
         rooms[c].append(r)
-        if schedule[r] in chair_map[c].favourites:
+        if schedule[r] == chair_map[c].favorite:
             sat[c] += satisfaction
 
     distance = {
@@ -131,7 +132,7 @@ def plot_satisfaction(
 
     fig, ax = plt.subplots(figsize=figsize)
 
-    dissat = {k: v * chair_map[k].lazy - sat[k] for k, v in distance.items()}
+    dissat = {k: v * (4 - chair_map[k].fitness) - sat[k] for k, v in distance.items()}
 
     for k, v in dissat.items():
         ax.bar(k, -v)

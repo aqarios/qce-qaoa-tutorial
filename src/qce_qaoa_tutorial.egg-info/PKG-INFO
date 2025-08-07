@@ -4,7 +4,6 @@ Version: 0.1.0
 Summary: Add your description here
 Requires-Python: >=3.13
 Description-Content-Type: text/markdown
-Requires-Dist: aqmodels
 Requires-Dist: dotenv>=0.9.9
 Requires-Dist: ipywidgets>=8.1.7
 Requires-Dist: luna-quantum==1.0.1

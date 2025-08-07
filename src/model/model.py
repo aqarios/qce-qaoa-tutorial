@@ -1,6 +1,6 @@
 import itertools
 
-from aqmodels import Model, Variable, quicksum
+from luna_quantum import Model, quicksum
 
 from model.data import ConventionCenter, Schedule, SessionChair
 
@@ -13,32 +13,36 @@ def optimization_model(
 ):
     model = Model("Session chair assignment")
 
-    x: dict[tuple[str, int], Variable] = {}
-    for room in schedule.rooms():
+    # Add binary variables to the optimization model
+    x = {}
+    for r in schedule.rooms():
         for i in range(len(chairs)):
-            x[room, i] = model.add_variable(f"x_{i}_{room}")
+            # If no vtype is specified, binary vtype is selected by default
+            x[r, i] = model.add_variable(f"x_{r}_{i}")
 
-    # one-hot constraints
-    for room in schedule.rooms():
-        model.add_constraint(
-            quicksum(x[room, i] for i in range(len(chairs))) == 1, f"chair_in_{room}"
-        )
-
-    # objectiv function: distance based
+    # Objective function part 1: Minimize total distance to travel for every session chair
     distance = convention_center.distance_map
     model.objective += quicksum(
-        round(chair.lazy * distance[room_a, room_b], 1) * x[room_a, i] * x[room_b, i]
+        round((4 - chair.fitness) * distance[room_a, room_b], 1)
+        * x[room_a, i]
+        * x[room_b, i]
         for i, chair in enumerate(chairs)
         for room_a, room_b in itertools.combinations(schedule.rooms(), r=2)
     )
-    # objectiv function: satisfaction
-    rev_map = {v: k for k, v in schedule.items()}
+
+    # Objective function part 2: Maximize satisfaction for chairing favorite sessions
+    session_to_room_map = {v: k for k, v in schedule.items()}
     model.objective -= quicksum(
-        satisfaction * x[rev_map[fav], i]
+        satisfaction * x[session_to_room_map[chair.favorite], i]
         for i, chair in enumerate(chairs)
-        for fav in chair.favourites
-        if fav in rev_map
     )
+
+    # one-hot constraints: Every room needs to have exactly one chair
+    for room in schedule.rooms():
+        constraint_name = f"someone_in_{room}"
+        model.add_constraint(
+            quicksum(x[room, i] for i in range(len(chairs))) == 1, constraint_name
+        )
 
     return x, model
 

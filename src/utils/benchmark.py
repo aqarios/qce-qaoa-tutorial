@@ -1,4 +1,4 @@
-from aqmodels import Solution
+from luna_quantum import Solution
 from qiskit.circuit.gate import np
 
 

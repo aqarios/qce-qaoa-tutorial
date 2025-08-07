@@ -3,12 +3,11 @@ name = "qce-qaoa-tutorial"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dependencies = [
-    "aqmodels",
     "dotenv>=0.9.9",
     "ipywidgets>=8.1.7",
-    "luna-quantum==1.0.3rc2",
+    "luna-quantum==1.0.4rc3",
     "matplotlib>=3.10.3",
     "names>=0.3.0",
     "networkx>=3.5",
@@ -35,8 +34,6 @@ dev = [
 [tool.uv.workspace]
 members = ["qce-qaoa-tutorial-public"]
 
-[tool.uv.sources]
-aqmodels = { git = "ssh://git@github.com/aqarios/aq-models-rs.git", branch = "feature/transformations" }
 
 [build-system]
 requires = ["hatchling"]

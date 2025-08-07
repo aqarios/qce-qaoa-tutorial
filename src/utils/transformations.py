@@ -2,8 +2,9 @@ import itertools
 from typing import override
 
 import networkx as nx
+import numpy as np
 import rustworkx as rx
-from aqmodels import (
+from luna_quantum import (
     Comparator,
     HigherOrder,
     Linear,
@@ -12,8 +13,8 @@ from aqmodels import (
     Solution,
     Variable,
 )
-from aqmodels.decorators import analyse, transform
-from aqmodels.transformations import (
+from luna_quantum.decorators import analyse, transform
+from luna_quantum.transformations import (
     ActionType,
     AnalysisCache,
     MaxBiasAnalysis,
@@ -28,9 +29,12 @@ def identify_one_hot(model: Model, _: AnalysisCache):
     """Identifies one-hot constraints present in the model."""
     onehots: list[int | str] = []
     for i, constraint in enumerate(model.constraints):
+        if constraint.comparator != Comparator.Eq:
+            continue
+        if constraint.lhs.has_quadratic() or constraint.lhs.has_higher_order():
+            continue
         if not all(
-            isinstance(k, Linear) and v == constraint.rhs
-            for k, v in constraint.lhs.items()
+            np.isclose(v, constraint.rhs) for _, v in constraint.lhs.linear_items()
         ):
             continue
         onehots.append(constraint.name or i)
@@ -118,7 +122,7 @@ def remove_one_hot(model: Model, cache: AnalysisCache):
 class QuadraticPenaltyPass(TransformationPass):
     """Integrates equality constraints as quadratic penalties."""
 
-    def __init__(self, penalty_factor: float = 5.0):
+    def __init__(self, penalty_factor: float = 2.0):
         self.penalty_factor = penalty_factor
 
     @property

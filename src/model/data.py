@@ -300,27 +300,38 @@ MARKERS = ["o", "s", "d", "X", "P", "<", ">", "^", "v", "h"]
 @dataclass
 class SessionChair:
     name: str
-    favourites: list[str] = field(default_factory=list)
-    lazy: float = 1
+    favorite: str
+    fitness: float = 1.0
     marker: str = "o"
 
+    def __post_init__(self):
+        if self.fitness > 3:
+            raise ValueError("Fitness needs to be less than 5.")
+        elif self.fitness < 1:
+            raise ValueError("Fitness needs to be more than 1.")
+
     @staticmethod
-    def random_chairs(num: int, seed: int | None = None) -> list[SessionChair]:
+    def random_chairs(num: int, seed: int | None = None, schedule: Schedule | None =
+                      None) -> list[SessionChair]:
         random.seed(seed)
         chairs = []
 
-        for _ in range(num):
-            num_favs = 1
+        sessions = SESSIONS
+        if schedule is not None:
+            sessions = list(schedule.values())
+
+        fav = random.sample(sessions, num)
+        for i in range(num):
             name = names.get_full_name()
-            favourites = random.sample(SESSIONS, num_favs)
-            lazy = random.randint(1, 3)
+            favorite = fav[i]
+            fitness = random.randint(1, 3)
             profdr = random.choice(["Prof. ", "Dr. "])
             marker = random.choice(MARKERS)
             chairs.append(
                 SessionChair(
                     name=profdr + name,
-                    favourites=favourites,
-                    lazy=lazy,
+                    favorite=favorite,
+                    fitness=fitness,
                     marker=marker,
                 )
             )

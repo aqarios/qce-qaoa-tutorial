@@ -1,7 +1,6 @@
 import random
 
-from aqmodels import Model
-from aqmodels.transformations import PassManager
+from luna_quantum import Model
 from luna_quantum.solve.parameters.algorithms.base_params.qaoa_circuit_params import (
     BasicQAOAParams,
     LinearQAOAParams,
@@ -10,12 +9,11 @@ from luna_quantum.solve.parameters.algorithms.base_params.qaoa_circuit_params im
 from luna_quantum.solve.parameters.algorithms.base_params.scipy_optimizer import (
     ScipyOptimizerParams,
 )
+from luna_quantum.transformations import PassManager
 from scipy.optimize import minimize
 
 from utils.qaoa import qaoa_circ_adv
 from utils.sampling import cost_function, sample
-
-type AnyQAOAParams = LinearQAOAParams | BasicQAOAParams | RandomQAOAParams
 
 
 class MyQAOA:
@@ -31,6 +29,7 @@ class MyQAOA:
         | RandomQAOAParams
         | None = None,
         optimizer: ScipyOptimizerParams | None = None,
+        optim_shots: int = 10000,
     ):
         self.pass_manager = pass_manager
         self.reps = reps
@@ -39,6 +38,7 @@ class MyQAOA:
             delta_beta=0.5, delta_gamma=0.5
         )
         self.optimizer = optimizer or ScipyOptimizerParams()
+        self.optim_shots = optim_shots
 
         self.qc = None
 
@@ -89,13 +89,13 @@ class MyQAOA:
 
         res = minimize(
             cost_function,
-            args=(ir.model, qc, log, self.shots),
+            args=(ir.model, qc, log, self.optim_shots or self.shots),
             x0=x0,
             **self._optimizer_kwargs(),
         )
 
         sol = sample(ir.model, qc, res.x, self.shots)
-        res = model.evaluate(self.pass_manager.backwards(sol, ir))
+        res = self.pass_manager.backwards(sol, ir)
 
         class ResultWrapper:
             def result(self):
