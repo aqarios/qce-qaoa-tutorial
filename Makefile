@@ -11,7 +11,7 @@ tutorials:
 	mkdir -p tutorials
 
 # Rule to process each notebook
-tutorials/%.ipynb: solutions/%.ipynb sub.sh | tutorials
+tutorials/%.ipynb: solutions/%.ipynb
 	scripts/sub.sh $< > $@
 
 # Clean target to remove tutorials directory
