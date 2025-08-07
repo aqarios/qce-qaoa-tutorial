@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 
-jq 'del(.cells[]?.execution_count, .cells[]?.outputs) |
-  (.cells[] | select(has("source")) | .source) |= 
+jq '(.cells[] | select(has("outputs")) | .outputs) = []
+  | (.cells[] | select(has("execution_count")) | .execution_count) = null
+  | (.cells[] | select(has("source")) | .source) |= 
   (
     def process_tasks:
       . as $lines |
