@@ -4,15 +4,18 @@ SOLUTIONS := $(wildcard solutions/*.ipynb)
 TUTORIALS := $(patsubst solutions/%.ipynb,tutorials/%.ipynb,$(SOLUTIONS))
 
 # Default target
-all: $(TUTORIALS)
+all: $(TUTORIALS) nbclean
 
 # Create tutorials directory if it doesn't exist
 tutorials:
 	mkdir -p tutorials
 
 # Rule to process each notebook
-tutorials/%.ipynb: solutions/%.ipynb scripts/sub.sh
+tutorials/%.ipynb: solutions/%.ipynb scripts/sub.sh tutorials
 	scripts/sub.sh $< > $@
+
+nbclean:
+	uvx nb-clean clean --remove-empty-cells tutorials/
 
 # Clean target to remove tutorials directory
 clean:
