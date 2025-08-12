@@ -11,7 +11,9 @@ def optimization_model(
     chairs: list[SessionChair],
     satisfaction: float = 5.0,
 ):
-    model = Model("Session chair assignment")
+    import os
+    test_id = os.environ.get("TEST_ID", "")
+    model = Model(f"Session chair assignment{test_id}")
 
     # Add binary variables to the optimization model
     x = {}
