@@ -100,6 +100,7 @@ def plot_floor_plan(
     plt.xlim(
         -0.5, max(x + w for (x, _, w, _) in convention_center.rooms.values()) + 0.5
     )
+    plt.tight_layout()
 
     return fig, ax
 

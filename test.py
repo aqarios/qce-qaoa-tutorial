@@ -1,33 +1,107 @@
-from luna_quantum.algorithms import FlexQAOA
-from luna_quantum.translator import LpTranslator
+from luna_quantum import Model, Variable, Vtype, algorithms, quicksum
+from luna_quantum.solve.parameters.algorithms.base_params import (
+    LinearQAOAParams,
+    ScipyOptimizerParams,
+)
+from luna_quantum.solve.parameters.algorithms.quantum_gate.flex_qaoa import (
+    OneHotParams,
+    PipelineParams,
+)
 
-LP_STR = r"""\ Model Session chair assignment
-\ Problem name: Session chair assignment
+facilities = {
+    "Munich": {"cost": 500, "capacity": 15},
+    "Nuremberg": {"cost": 400, "capacity": 9},
+    # "Augsburg": {"cost": 350, "capacity": 10},
+}
+hospitals = {
+    "H2": {"location": "Munich-North", "demand": 6},
+    "H3": {"location": "Nuremberg-South", "demand": 5},
+    # "H4": {"location": "Augsburg-West", "demand": 3},
+    # "H8": {"location": "Erlangen", "demand": 2},
+}
 
-Minimize
- obj: [ 15 x_016_0 * x_028_0 + 8 x_016_0 * x_020_0 + 10 x_016_0 * x_031_0 + 9.6 x_016_0 
- * x_027_0 + 45 x_016_1 * x_028_1 + 24 x_016_1 * x_020_1 + 30 x_016_1 * x_031_1 + 28.8 
- x_016_1 * x_027_1 + 30 x_016_2 * x_028_2 + 16 x_016_2 * x_020_2 + 20 x_016_2 * x_031_2 
- + 19.2 x_016_2 * x_027_2 + 7 x_028_0 * x_020_0 + 7.8 x_028_0 * x_031_0 + 10.8 x_028_0 
- * x_027_0 + 21 x_028_1 * x_020_1 + 23.4 x_028_1 * x_031_1 + 32.4 x_028_1 * x_027_1 + 14 
- x_028_2 * x_020_2 + 15.6 x_028_2 * x_031_2 + 21.6 x_028_2 * x_027_2 + 2 x_020_0 
- * x_031_0 + 3.8 x_020_0 * x_027_0 + 6 x_020_1 * x_031_1 + 11.4 x_020_1 * x_027_1 + 4 
- x_020_2 * x_031_2 + 7.6 x_020_2 * x_027_2 + 3.4 x_031_0 * x_027_0 + 10.2 x_031_1 
- * x_027_1 + 6.8 x_031_2 * x_027_2 ] / 2 -2 x_016_0 - 2 x_031_2 - 2 x_027_1
-Subject To
- someone_in_016: x_016_0 + x_016_1 + x_016_2 = 1
- someone_in_028: x_028_0 + x_028_1 + x_028_2 = 1
- someone_in_020: x_020_0 + x_020_1 + x_020_2 = 1
- someone_in_031: x_031_0 + x_031_1 + x_031_2 = 1
- someone_in_027: x_027_0 + x_027_1 + x_027_2 = 1
-Bounds
-Binaries
- x_016_0 x_016_1 x_016_2 x_028_0 x_028_1 x_028_2 x_020_0 x_020_1 x_020_2 x_031_0 x_031_1 
- x_031_2 x_027_0 x_027_1 x_027_2
-End
-"""
+# Transportation costs (€ per ton)
+transport_costs = {
+    ("H1", "Munich"): 0.10,
+    ("H1", "Nuremberg"): 0.45,
+    ("H1", "Augsburg"): 0.25,
+    ("H1", "Regensburg"): 0.50,
+    ("H2", "Munich"): 0.15,
+    ("H2", "Nuremberg"): 0.40,
+    ("H2", "Augsburg"): 0.30,
+    ("H2", "Regensburg"): 0.55,
+    ("H3", "Munich"): 0.40,
+    ("H3", "Nuremberg"): 0.12,
+    ("H3", "Augsburg"): 0.50,
+    ("H3", "Regensburg"): 0.35,
+    ("H4", "Munich"): 0.45,
+    ("H4", "Nuremberg"): 0.18,
+    ("H4", "Augsburg"): 0.55,
+    ("H4", "Regensburg"): 0.40,
+    ("H5", "Munich"): 0.20,
+    ("H5", "Nuremberg"): 0.55,
+    ("H5", "Augsburg"): 0.8,
+    ("H5", "Regensburg"): 0.60,
+    ("H6", "Munich"): 0.50,
+    ("H6", "Nuremberg"): 0.35,
+    ("H6", "Augsburg"): 0.60,
+    ("H6", "Regensburg"): 0.10,
+    ("H7", "Munich"): 0.35,
+    ("H7", "Nuremberg"): 0.30,
+    ("H7", "Augsburg"): 0.40,
+    ("H7", "Regensburg"): 0.25,
+    ("H8", "Munich"): 0.40,
+    ("H8", "Nuremberg"): 0.15,
+    ("H8", "Augsburg"): 0.45,
+    ("H8", "Regensburg"): 0.30,
+}
 
-model = LpTranslator.to_aq(LP_STR)
-job = FlexQAOA().run(model)
-job.result()
-print(job.metadata)
+depot = "Munich"
+m = Model()
+
+
+# add variables
+x = {}
+y = {}
+with m.environment:
+    for f in facilities:
+        for h in hospitals:
+            x[(f, h)] = Variable(vtype=Vtype.Binary, name=f"x_{f},{h}")
+        y[f] = Variable(vtype=Vtype.Binary, name=f"y_{f}")
+
+# add cost to transport goods
+m.objective += quicksum(
+    x[f, h] * transport_costs[(h, f)] for f in facilities for h in hospitals
+)
+
+# add cost to open facility
+m.objective += quicksum(y[f] * facilities[f]["cost"] for f in facilities)
+
+
+# each hospital must be delivered
+for h in hospitals:
+    m.add_constraint(
+        quicksum(x[f, h] for f in facilities) == 1, name=f"deliver_hospital_{h}"
+    )
+
+# at most usage of capacity
+for f in facilities:
+    m.add_constraint(
+        quicksum(hospitals[h]["demand"] * x[f, h] for h in hospitals)
+        <= facilities[f]["capacity"] * y[f],
+        name=f"deliver_hospital_{f}",
+    )
+
+
+qaoa = algorithms.FlexQAOA(
+    reps=3,
+    pipeline=PipelineParams(
+        indicator_function=None,
+        one_hot=OneHotParams(),
+    ),
+    initial_params=LinearQAOAParams(delta_beta=0.2, delta_gamma=0.2),
+    optimizer=ScipyOptimizerParams(method="COBYLA"),
+)
+qaoa_job = qaoa.run(m)
+qaoa_sol = qaoa_job.result()
+print(qaoa_sol)
