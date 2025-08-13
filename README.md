@@ -14,7 +14,7 @@ platform for solving your optimization problems. See how _FlexQAOA_ does constra
 handling automatically.
 - [05_Benchmarking](tutorials/05_Benchmarking.ipynb): Best Practices in Benchmarking
 Quantum Optimization Algorithms
-- [06_ModelExtensions](tutorials/06_ModelExtensions.ipynb): Getting to know more
+- [06_ModelExtension](tutorials/06_ModelExtension.ipynb): Getting to know more
 capabilities of FlexQAOA.
 
 We hope you have fun exploring this tutorial! 🚀
