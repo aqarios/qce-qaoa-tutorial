@@ -42,7 +42,7 @@ Plese complete the steps you are ask and log into the platform.
 You should be able to see the **Luna API Key** field on the top right. Copy the key and
 put it into the `.env` file.
 ```
-echo "LUNA_API_KEY=<THE_API_KEY> > .env"
+echo "LUNA_API_KEY=<THE_API_KEY>" > .env
 ```
 
 ---
