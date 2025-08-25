@@ -7,8 +7,8 @@ import time
 from datetime import datetime
 
 SCRIPT_EXEC = ["uv", "run", "ipython"]
-NB_NAME = "solutions/04_Aqarios_Luna.ipynb"
-NUM_PROCESSES = 30
+NB_NAME = "solutions/05_Benchmarking.ipynb"
+NUM_PROCESSES = 10
 TIMEOUT = 80 * 30
 
 
