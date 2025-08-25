@@ -42,3 +42,5 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/utils", "src/model"]
 
+[tool.ruff]
+exclude = [".venv", "./tutorials"]

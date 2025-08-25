@@ -9,7 +9,7 @@ class pretty:
         if sort_feasible:
             infeasible = np.array([not x.feasible for x in sol])
             keys.append(infeasible)
-        self._sorted = np.lexsort(keys) # type: ignore
+        self._sorted = np.lexsort(keys)  # type: ignore
         cx = np.cumsum(list(map(len, sol.variable_names))) < 80
         self._vars = [var for var, ci in zip(sol.variable_names, cx) if ci]
         self._all_vars = cx[-1]

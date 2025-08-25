@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import names
 import networkx as nx
@@ -311,8 +311,9 @@ class SessionChair:
             raise ValueError("Fitness needs to be more than 1.")
 
     @staticmethod
-    def random_chairs(num: int, seed: int | None = None, schedule: Schedule | None =
-                      None) -> list[SessionChair]:
+    def random_chairs(
+        num: int, seed: int | None = None, schedule: Schedule | None = None
+    ) -> list[SessionChair]:
         random.seed(seed)
         chairs = []
 

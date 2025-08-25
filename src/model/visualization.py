@@ -2,7 +2,7 @@ import itertools
 
 import matplotlib.pyplot as plt
 import numpy as np
-from luna_quantum import Result, Variable
+from luna_quantum import Result
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 

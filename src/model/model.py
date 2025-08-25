@@ -12,6 +12,7 @@ def optimization_model(
     satisfaction: float = 5.0,
 ):
     import os
+
     test_id = os.environ.get("TEST_ID", "")
     model = Model(f"Session chair assignment{test_id}")
 

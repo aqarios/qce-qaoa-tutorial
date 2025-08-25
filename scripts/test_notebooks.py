@@ -58,7 +58,7 @@ def run_test_process(test_id, notebook_name):
             "error": "timeout",
             "stdout": e.stdout.decode("utf-8") if e.stdout is not None else "",
             "stderr": e.stderr.decode("utf-8") if e.stderr is not None else "",
-    }
+        }
     except Exception as e:
         print(f"Process {test_id} failed with error: {e}")
         return {"test_id": test_id, "success": False, "duration": 0, "error": str(e)}
@@ -118,7 +118,7 @@ def main():
     for result in results:
         with open(f"logs/{result['test_id']}", "w") as f:
             f.write(result.get("stdout", ""))
-            f.write("="*50 + "\n")
+            f.write("=" * 50 + "\n")
             f.write(result.get("stderr", ""))
 
     return 0 if failed == 0 else 1
