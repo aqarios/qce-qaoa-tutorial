@@ -352,3 +352,13 @@ class Schedule(dict[str, str]):
 
     def rooms(self):
         return list(self.keys())
+
+    def __eq__(self, other):
+        """Enable equality comparison between Schedule instances."""
+        if not isinstance(other, Schedule):
+            return False
+        return dict(self) == dict(other)
+
+    def __hash__(self):
+        """Enable Schedule to be used as dict key or in sets (optional)."""
+        return hash(tuple(sorted(self.items())))
