@@ -80,7 +80,7 @@ HELPERS = {
     "h2": [(4, 8.5)],
     "h3": [(9, 4)],
     "h4": [(9, 8.5)],
-    "h5": [(18, 4)],
+    # "h5": [(18, 4)],
 }
 
 EDGES = [
@@ -189,18 +189,34 @@ EDGES = [
     ("010", "015"),
     ("010", "h1"),
     ("010", "h3"),
-    ("h3", "h5"),
+    # ("h3", "h5"),
     ("015", "065"),
     ("015", "070"),
     ("015", "h3"),
     ("015", "h4"),
-    ("015", "h5"),
-    ("060", "h5"),
+    ("030", "h4"),
+    ("032", "h4"),
+    # ("015", "h5"),
+    # ("060", "h5"),
     ("065", "h3"),
     ("070", "h3"),
-    ("065", "h5"),
-    ("070", "h5"),
+    # ("065", "h5"),
+    # ("070", "h5"),
+    ("h1", "h2"),
+    ("h2", "h4"),
+    ("h4", "h3"),
+    ("h3", "h1"),
+    ("030", "h2"),
+    ("032", "h2"),
 ]
+
+# def _replace(x: list, s, t):
+#     try:
+#         idx = x.index(s, 1, len(x) - 1)
+#         x[idx] = t
+#     except ValueError:
+#         pass
+#     return x
 
 
 def get_door(x: float, y: float, w: float, h: float, i: float):
@@ -235,6 +251,7 @@ class ConventionCenter:
     doors: dict[str, list[float]]
     door_pos: dict[str, list[tuple[float, float]]]
     distance_map: dict[tuple[str, str], float]
+    _graph: nx.Graph
 
     @staticmethod
     def generate(active: None | list[str] = None):
@@ -260,13 +277,24 @@ class ConventionCenter:
                     g.add_edge(*e, weight=distance)
 
         data = {}
-        for n, e in nx.all_pairs_dijkstra_path_length(g):
+        nodes = set(DOOR_POS.keys())
+        for n, e in nx.all_pairs_dijkstra_path(g):
             if n.startswith("h"):
                 continue
 
+            def _path_weight(p: list):
+                if len(p) > 2 and not all(elem.startswith("h") for elem in p[1:-1]):
+                    gloc = g.copy()
+                    s, t = p[0], p[-1]
+
+                    gloc.remove_nodes_from(nodes - {s, t})
+                    p = nx.dijkstra_path(gloc, s, t)
+
+                return round(float(nx.path_weight(g, p, "weight")), 1)
+
             data.update(
                 {
-                    (n, k): round(float(v), 1)
+                    (n, k): _path_weight(v)
                     for k, v in e.items()
                     if not k.startswith("h") and n != k
                 }
@@ -277,7 +305,13 @@ class ConventionCenter:
             doors={k: v for k, v in DOORS.items() if k in active},
             door_pos={k: v for k, v in DOOR_POS.items() if k in active},
             distance_map=data,
+            _graph=g,
         )
+
+    def draw(self, ax=None):
+        layout = {k: np.array(v).mean(axis=0) for k, v in DOOR_POS.items()}
+        layout.update({k: np.array(v).mean(axis=0) for k, v in HELPERS.items()})
+        nx.draw(self._graph, layout, ax=ax, edge_color="darkred")
 
 
 SESSIONS = [
