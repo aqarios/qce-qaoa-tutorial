@@ -2,14 +2,17 @@ import itertools
 
 import matplotlib.pyplot as plt
 import numpy as np
-from luna_quantum import Result
+from luna_quantum import Solution
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 
 from .data import ConventionCenter, Schedule, SessionChair, get_door
 
 
-def solution_to_assignment(best: Result, chairs: list[SessionChair]):
+def solution_to_assignment(sol: Solution, chairs: list[SessionChair]):
+    best = sol.filter_feasible().best()
+    assert best is not None
+
     def _from_name(k):
         _, r, i = k.split("_")
         return chairs[int(i)].name, r

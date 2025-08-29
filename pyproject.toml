@@ -44,3 +44,6 @@ packages = ["src/utils", "src/model"]
 
 [tool.ruff]
 exclude = [".venv", "./tutorials"]
+#
+# [tool.ruff.lint]
+# select = ["F401"]

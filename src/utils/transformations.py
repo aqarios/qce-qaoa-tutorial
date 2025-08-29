@@ -122,7 +122,7 @@ def remove_one_hot(model: Model, cache: AnalysisCache):
 class QuadraticPenaltyPass(TransformationPass):
     """Integrates equality constraints as quadratic penalties."""
 
-    def __init__(self, penalty_factor: float = 2.0):
+    def __init__(self, penalty_factor: float = 3.0):
         self.penalty_factor = penalty_factor
 
     @property
