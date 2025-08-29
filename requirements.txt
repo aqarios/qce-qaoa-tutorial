@@ -104,7 +104,6 @@ python-json-logger==3.3.0
 pytz==2025.2
 pyyaml==6.0.2
 pyzmq==27.0.1
--e file:///Users/david/work/qce-qaoa-tutorial
 qiskit==2.1.1
 qiskit-aer==0.17.1
 referencing==0.36.2
