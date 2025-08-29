@@ -32,6 +32,7 @@ and every dependency will be installed.
 Otherwise, you can use your preferred dependency management, e.g. pip
 ```
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ## Luna Registration
