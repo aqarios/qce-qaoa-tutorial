@@ -2,7 +2,7 @@
 
 > A tutorial by [Aqarios GmbH](https:://www.aqarios.com)
 
-[https://aqarios-my.sharepoint.com/:p:/p/david_bucher/EZPjH2_c6I1JsrLGk6xl9BwBt0BZthReACltFgPBhP8xsQ?e=8muCXe](Link to Tutorial Slides)
+[Link to Tutorial Slides](https://aqarios-my.sharepoint.com/:p:/p/david_bucher/EZPjH2_c6I1JsrLGk6xl9BwBt0BZthReACltFgPBhP8xsQ?e=8muCXe)
 
 This tutorial is composed of six notebooks that will teach you
 - [01_QAOA](tutorials/01_QAOA.ipynb): The basics of the Quantum Approximate Optimization
